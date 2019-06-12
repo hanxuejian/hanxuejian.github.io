@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Deep Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="不骄 不躁 不离 不弃">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Deep Think">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="Deep Think">
+<meta property="og:locale" content="zh-Hans">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Deep Think">
+  
+    <link rel="alternate" href="/atom.xml" title="Deep Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Deep Think</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-UILayoutGuide" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/10/UILayoutGuide/" class="article-date">
+  <time datetime="2019-06-10T08:47:17.307Z" itemprop="datePublished">2019-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/10/UILayoutGuide/">NSLayoutAnchor</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在 iOS 9.0 之后，UIView 中新增了一个 <code>UIViewLayoutConstraintCreation</code> 分类，该分类声明了一些 <code>NSLayoutAnchor</code> 属性，用来简化视图约束的创建。</p>
+<p>NSLayoutAnchor 虽然给出了 <code>NSLayoutXAxisAnchor</code>、<code>NSLayoutYAxisAnchor</code>、<code>NSLayoutDimension</code> 三个子类，分别用来描述横向、纵向和长宽的相关信息，但是并没有声明任何属性或初始化方法。</p>
+<p>从 UIView 的 UIViewLayoutConstraintCreation 分类中属性的只读特性来看，其是由框架内部创建，并且完全是对开发者透明的，使用的形式如下：</p>
+<p><code>[myView.topAnchor constraintEqualToAnchor:otherView.topAnchor constant:10];</code></p>
+<p>那么，NSLayoutAnchor 更像是对 NSLayoutAttribute 的封装。如果根据约束的核心公式推断，该类中也定然保存着相关联的视图。</p>
+<h2 id="UILayoutGuide"><a href="#UILayoutGuide" class="headerlink" title="UILayoutGuide"></a>UILayoutGuide</h2><p>为了适配不同的机型，规避状态栏或导航栏带来的视图布局影响，可以使用 UIViewController 分类 UILayoutSupport 中的 <code>topLayoutGuide</code> 和 <code>bottomLayoutGuide</code> 属性。不过 iOS 11.0 之后，使用 UIView 中的 <code>safeAreaLayoutGuide</code> 属性更加方便。<br>这个属性是 <code>UILayoutGuide</code> 类，该类在 iOS 9.0 就生效了。巧的是，其也声明了同 <code>UIViewLayoutConstraintCreation</code> 分类中相同的属性，且是只读的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@property(nonatomic,readonly,strong) NSLayoutXAxisAnchor *leadingAnchor;</span><br><span class="line">//...</span><br><span class="line">@property(nonatomic,readonly,strong) NSLayoutYAxisAnchor *centerYAnchor;</span><br></pre></td></tr></table></figure>
+
+<p>实际上，从 safeAreaLayoutGuide 属性就可以知道，UILayoutGuide 实例对象是可以用来创建约束的，其定义了布局中的一个长方形区域，同视图类似，但是他们并不会显示在视图层级中，也不会响应相关的事件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">- (void)btnClick &#123;</span><br><span class="line">    </span><br><span class="line">    NSMutableArray *btns = [NSMutableArray arrayWithCapacity:2];</span><br><span class="line">    for (int i=0;i&lt;2;i++) &#123;</span><br><span class="line">        UIButton *btn = [[UIButton alloc]init];</span><br><span class="line">        btn.backgroundColor = UIColor.redColor;</span><br><span class="line">        btn.translatesAutoresizingMaskIntoConstraints = NO;</span><br><span class="line">        [btns addObject:btn];</span><br><span class="line">        [self.view addSubview:btn];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    NSMutableArray *guides = [NSMutableArray arrayWithCapacity:3];</span><br><span class="line">    for (int i=0;i&lt;3;i++) &#123;</span><br><span class="line">        </span><br><span class="line">        int a = 1;</span><br><span class="line">        </span><br><span class="line">        if (a) &#123;</span><br><span class="line">            UILayoutGuide *guide = [[UILayoutGuide alloc]init];</span><br><span class="line">            [self.view addLayoutGuide:guide];</span><br><span class="line">            [guides addObject:guide];</span><br><span class="line">        &#125;else &#123;</span><br><span class="line">            UIView *guide = [[UIView alloc]init];</span><br><span class="line">            guide.backgroundColor = UIColor.greenColor;</span><br><span class="line">            guide.translatesAutoresizingMaskIntoConstraints = NO;</span><br><span class="line">            [self.view addSubview:guide];</span><br><span class="line">            [guides addObject:guide];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    UILayoutGuide *guide1 = guides[0];</span><br><span class="line">    UILayoutGuide *guide2 = guides[1];</span><br><span class="line">    UILayoutGuide *guide3 = guides[2];</span><br><span class="line">    </span><br><span class="line">    UIButton *btn1 = btns[0];</span><br><span class="line">    UIButton *btn2 = btns[1];</span><br><span class="line">    </span><br><span class="line">    [guide1.leftAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leftAnchor constant:15].active = YES;</span><br><span class="line">    [guide1.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;</span><br><span class="line">    </span><br><span class="line">    [btn1.leftAnchor constraintEqualToAnchor:guide1.rightAnchor].active = YES;</span><br><span class="line">    [btn1.topAnchor constraintEqualToAnchor:guide1.topAnchor].active = YES;</span><br><span class="line">    </span><br><span class="line">    [guide2.leftAnchor constraintEqualToAnchor:btn1.rightAnchor].active = YES;</span><br><span class="line">    [guide2.topAnchor constraintEqualToAnchor:guide1.topAnchor].active = YES;</span><br><span class="line">    </span><br><span class="line">    [btn2.leftAnchor constraintEqualToAnchor:guide2.rightAnchor].active = YES;</span><br><span class="line">    [btn2.topAnchor constraintEqualToAnchor:guide1.topAnchor].active = YES;</span><br><span class="line">    [btn2.widthAnchor constraintEqualToConstant:100].active = YES;</span><br><span class="line">    [btn2.widthAnchor constraintEqualToAnchor:btn1.widthAnchor].active = YES;</span><br><span class="line">    [btn2.heightAnchor constraintEqualToConstant:50].active = YES;</span><br><span class="line">    [btn2.heightAnchor constraintEqualToAnchor:btn1.heightAnchor].active = YES;</span><br><span class="line">    </span><br><span class="line">    [guide3.leftAnchor constraintEqualToAnchor:btn2.rightAnchor].active = YES;</span><br><span class="line">    [guide3.topAnchor constraintEqualToAnchor:guide1.topAnchor].active = YES;</span><br><span class="line">    [guide3.rightAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.rightAnchor constant:-15].active = YES;</span><br><span class="line">    </span><br><span class="line">    [guide3.widthAnchor constraintEqualToAnchor:guide2.widthAnchor].active = YES;</span><br><span class="line">    [guide3.widthAnchor constraintEqualToAnchor:guide1.widthAnchor].active = YES;</span><br><span class="line">    </span><br><span class="line">    [guide3.heightAnchor constraintEqualToAnchor:guide2.heightAnchor].active = YES;</span><br><span class="line">    [guide3.heightAnchor constraintEqualToAnchor:guide1.heightAnchor].active = YES;</span><br><span class="line">    [guide3.heightAnchor constraintEqualToConstant:50].active = YES;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个例子表明在布局时，<code>UILayoutGuide</code> 的使用可以帮助我们减少不必要的视图。但是也可以看出，<br>虽然 <code>NSLayoutAnchor</code> 类和 <code>NSLayoutConstraint</code> 类属性 <code>active</code> 的使用使得约束的创建简化了很多，但是可读性仍然很差，如果出现错误，查找十分麻烦。</p>
+<p>而 <code>Masonry</code> 框架是不支持 <code>UILayoutGuide</code> 的，不过，其声明了的 <code>MASAdditions</code> 分类中提供了针对这种情况的方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">typedef NS_ENUM(NSUInteger, MASAxisType) &#123;</span><br><span class="line">    MASAxisTypeHorizontal,</span><br><span class="line">    MASAxisTypeVertical</span><br><span class="line">&#125;;</span><br><span class="line">- (void)mas_distributeViewsAlongAxis:(MASAxisType)axisType</span><br><span class="line">                    withFixedSpacing:(CGFloat)fixedSpacing</span><br><span class="line">                         leadSpacing:(CGFloat)leadSpacing</span><br><span class="line">                         tailSpacing:(CGFloat)tailSpacing;</span><br><span class="line"></span><br><span class="line">- (void)mas_distributeViewsAlongAxis:(MASAxisType)axisType</span><br><span class="line">                 withFixedItemLength:(CGFloat)fixedItemLength</span><br><span class="line">                         leadSpacing:(CGFloat)leadSpacing</span><br><span class="line">                         tailSpacing:(CGFloat)tailSpacing;</span><br></pre></td></tr></table></figure>
+
+<p>这两个方法可以在水平或垂直方向上排列数组中的视图，区别是视图之间的间隔是固定的值或者视图的宽高是固定值。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/10/UILayoutGuide/" data-id="cjwsozzuh00005pawu5jwrgj2" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/06/10/UILayoutGuide/">NSLayoutAnchor</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Martin<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
